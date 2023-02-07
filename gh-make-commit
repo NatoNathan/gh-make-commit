@@ -30,21 +30,19 @@ scopeFile=$(pwd)/.scopes
 #   shift
 # done
 
-echo "Pick Commit Type"
-TYPE=$(echo -e $commitTypes | gum filter --no-strict )
+TYPE=$(echo -e $commitTypes | gum filter --no-strict --prompt="Pick Commit Type: " )
 
 if test -f "$scopeFile"; then
-    echo "Pick Commit Scopes"
-    SCOPE=$(echo $scopeFile | gum filter --no-stric --no-lint )
+    SCOPE=$(cat $scopeFile | gum filter --no-strict --prompt="Pick Commit Scope: " )
 else
-    echo "Enter Commit Scopes"
-    SCOPE=$(gum input --placeholder "scope")
+    SCOPE=$(gum input --placeholder "scope" --header="Pick Commit Scope: ")
 fi
+
 test -n "$SCOPE" && SCOPE="($SCOPE)"
 
-echo "Enter Commit Summary"
-SUMMARY=$(gum input --value "$TYPE$SCOPE: " --char-limit=50 --placeholder "Summary of this change")
-echo "Enter Commit Details"
-DESCRIPTION=$(gum write --placeholder "Details of this change (CTRL+D to finish)")
+
+SUMMARY=$(gum input --header="Enter Commit Summary: " --value "$TYPE$SCOPE: " --width 50 --char-limit=50 --placeholder "Summary of this change")
+DESCRIPTION=$(gum write --header="Enter Commit Details: "  --width 80 --placeholder "Details of this change (CTRL+D to finish)")
+
 
 git commit -m "$SUMMARY" -m "$DESCRIPTION" -e
